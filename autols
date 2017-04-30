@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+MAX_FILES_FOR_AUTO_LS=150
+AUTO_LS="true"
+
+# Automatically ls after cd unless the number of files
+# in a directory is greater than MAX_FILES_FOR_AUTO_LS.
+# Use -b anywhere in the command to use cd's [b]uiltin
+# functionality instead
+cd() {
+    local FLAG_BOOL="false"
+    local FLAG_STR="-b"
+    local IND=0 
+
+    # Check all the arguments for the builtin flag
+    if [ "$1" = $FLAG_STR ]; then
+        FLAG_BOOL="true"
+        shift
+    else
+        for var in "$@"
+        do
+            ((IND+=1))
+            if [ "$var" = $FLAG_STR ]; then
+                FLAG_BOOL="true"
+                set -- "${@:0:IND}" "${@:IND+1}"
+                break
+            fi
+        done
+    fi
+
+    # Choose and execute cd functionality based on flags and global variables
+    if [ $AUTO_LS = "true" ] && [ $FLAG_BOOL = "false" ]; then
+        if builtin cd "$@"; then
+            local file_count="$(ls -q | wc -l)"
+            if [ "$file_count" -le "$MAX_FILES_FOR_AUTO_LS" ]; then
+                ls
+            else
+                echo "$file_count files in directory"
+            fi
+        fi
+    else
+        builtin cd "$@"
+    fi
+}
+
+# Change the maximum number of files a directory can
+# have such that cd will automatically trigger an ls
+set_max_auto_ls() {
+    # There has to be an argument that's a number
+    if [ "$1" -gt -1 ]; then
+        MAX_FILES_FOR_AUTO_LS="$1"
+    else
+        echo "set_max_auto_ls: usage: set_max_auto_ls [int >= 0]"
+    fi
+}
+
+# Turn the auto ls functionality on or off
+toggle_auto_ls() {
+    if [ $AUTO_LS = "true" ]; then
+        AUTO_LS="false"
+        echo "cd set to builtin functionality"
+    else
+        AUTO_LS="true"
+        echo "cd set to automatically ls in directories with fewer than $((MAX_FILES_FOR_AUTO_LS+1)) files"
+    fi
+}
+
