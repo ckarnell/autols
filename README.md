@@ -2,7 +2,7 @@
 Causes cd to automatically trigger ls under certain conditions. This script provides a strict superset of the functionality of cd.
 
 # Installation
-Just put the script in your root directory and put `. $HOME/autols` at *the end of your .bash_profile*. It can also be put at the end of your .bash_rc, but there is a common "gotcha" that I'll write about at the bottom of this README.
+To get this working right away, just put the script in your root directory and put `. $HOME/autols` at *the end of your .bash_profile*. It can also be put in your .bash_rc (or wherever you want), but there is a common "gotcha" that I'll write about at the bottom of this README.
 
 # Usage
 When this script is in use, by default, cd-ing into a directory will automatically ls it's contents unless it has more than 150 non-hidden files/directories. If there are more than 150, it will simply cd you into the directory and give a short message about how many visible files the directory contains.
